@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
+
+class OrderItemResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        $image = $this->product_image;
+
+        return [
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'variant_id' => $this->variant_id,
+            'product_name' => $this->product_name,
+            'variant_name' => $this->variant_name,
+            'product_image' => $image
+                ? (Str::startsWith($image, ['http://', 'https://']) ? $image : asset('storage/' . $image))
+                : null,
+            'quantity' => $this->quantity,
+            'price' => $this->price,
+            'subtotal' => $this->subtotal,
+        ];
+    }
+}
