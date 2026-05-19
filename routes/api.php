@@ -22,6 +22,7 @@ use App\Http\Controllers\API\V1\ShippingController;
 use App\Http\Controllers\API\V1\ChatController;
 use App\Http\Controllers\API\V1\AddressController;
 use App\Http\Controllers\API\V1\MidtransWebhookController;
+use App\Http\Controllers\API\V1\StoreStatsController;
 
 // ADMIN
 use App\Http\Controllers\API\V1\Admin\DashboardController;
@@ -65,6 +66,7 @@ Route::prefix('v1')->group(function () {
     Route::get('blogs', [BlogController::class, 'index']);
     Route::get('blogs/{id}', [BlogController::class, 'show']);
     Route::get('settings', [SiteSettingController::class, 'show']);
+    Route::get('store-stats', StoreStatsController::class);
     Route::post('contact', [ContactMessageController::class, 'store']);
     Route::post('payment/midtrans/notification', MidtransWebhookController::class);
 

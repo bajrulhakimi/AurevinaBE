@@ -9,7 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE reviews MODIFY order_item_id BIGINT UNSIGNED NULL');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE reviews MODIFY order_item_id BIGINT UNSIGNED NULL');
+        }
 
         Schema::table('reviews', function (Blueprint $table) {
             if (!Schema::hasColumn('reviews', 'updated_at')) {
@@ -36,7 +38,9 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE reviews MODIFY order_item_id BIGINT UNSIGNED NOT NULL');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE reviews MODIFY order_item_id BIGINT UNSIGNED NOT NULL');
+        }
 
         Schema::table('reviews', function (Blueprint $table) {
             if (Schema::hasColumn('reviews', 'replied_by')) {

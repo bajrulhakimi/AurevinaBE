@@ -10,8 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('shipping')) {
-            DB::statement('ALTER TABLE shipping MODIFY courier VARCHAR(100) NULL');
-            DB::statement('ALTER TABLE shipping MODIFY tracking_number VARCHAR(100) NULL');
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement('ALTER TABLE shipping MODIFY courier VARCHAR(100) NULL');
+                DB::statement('ALTER TABLE shipping MODIFY tracking_number VARCHAR(100) NULL');
+            }
 
             Schema::table('shipping', function (Blueprint $table) {
                 if (!Schema::hasColumn('shipping', 'updated_at')) {
