@@ -1,4 +1,4 @@
-# Deploy Backend Aurevina ke DomaiNesia
+# Deploy Backend Aurevina ke Rumahweb
 
 ## Repository
 
@@ -8,7 +8,7 @@ Gunakan repository backend:
 https://github.com/bajrulhakimi/AurevinaBE
 ```
 
-## Struktur Hosting
+## Struktur Hosting Rumahweb
 
 Backend Laravel harus diarahkan ke folder:
 
@@ -16,7 +16,7 @@ Backend Laravel harus diarahkan ke folder:
 public
 ```
 
-Jika memakai subdomain seperti `api.aurevina.com`, atur document root subdomain di cPanel/DomaiNesia ke:
+Jika memakai subdomain seperti `api.aurevina.com`, atur document root subdomain di cPanel/Rumahweb ke:
 
 ```text
 /path-ke-project-aurevinabe/public
@@ -26,27 +26,27 @@ Jangan arahkan document root ke folder root Laravel, karena file seperti `.env`,
 
 ## Environment Production
 
-Buat file `.env` di server dari `.env.example`, lalu isi sesuai hosting:
+Buat file `.env` di server dari `.env.example`, lalu isi sesuai hosting Rumahweb:
 
 ```env
 APP_NAME=Aurevina
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://api-domain-anda.com
-FRONTEND_URL=https://frontend-vercel-anda.vercel.app
+APP_URL=https://api-domain-rumahweb-anda.com
+FRONTEND_URL=https://aurevina.vercel.app
 
 DB_CONNECTION=mysql
 DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=nama_database_domainesia
-DB_USERNAME=user_database_domainesia
-DB_PASSWORD=password_database_domainesia
+DB_DATABASE=nama_database_rumahweb
+DB_USERNAME=user_database_rumahweb
+DB_PASSWORD=password_database_rumahweb
 
 FILESYSTEM_DISK=public
 QUEUE_CONNECTION=database
 ```
 
-Untuk email verifikasi, jangan pakai `MAIL_MAILER=log` di production. Pakai SMTP DomaiNesia atau SMTP lain:
+Untuk email verifikasi, jangan pakai `MAIL_MAILER=log` di production. Pakai SMTP Rumahweb atau SMTP lain:
 
 ```env
 MAIL_MAILER=smtp
@@ -75,7 +75,7 @@ https://api-domain-anda.com/api/v1/payment/midtrans/notification
 
 ## Command Setelah Upload
 
-Jalankan melalui SSH/Terminal DomaiNesia:
+Jalankan melalui SSH/Terminal Rumahweb:
 
 ```bash
 composer install --no-dev --optimize-autoloader
@@ -121,8 +121,8 @@ FRONTEND_URL=https://aurevina.com,https://aurevina.vercel.app
 Cek API:
 
 ```text
-https://api-domain-anda.com/api/v1/products
-https://api-domain-anda.com/api/v1/store-stats
+https://api-domain-rumahweb-anda.com/api/v1/products
+https://api-domain-rumahweb-anda.com/api/v1/store-stats
 ```
 
 Kalau muncul JSON, backend sudah aktif.
