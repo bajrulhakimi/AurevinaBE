@@ -26,15 +26,21 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $data = $request->validated();
-        unset($data['image'], $data['images'], $data['color_variations'], $data['size_variations'], $data['variations_enabled']);
+        unset($data['image'], $data['images'], $data['existing_images'], $data['color_variations'], $data['size_variations'], $data['variations_enabled']);
         
         $uploadedImages = $request->file('images', []);
         if ($request->hasFile('image') && empty($uploadedImages)) {
             $uploadedImages = [$request->file('image')];
         }
+        $existingImages = collect($request->input('existing_images', []))
+            ->filter()
+            ->values()
+            ->all();
 
         if (!empty($uploadedImages)) {
             $data['main_image'] = $uploadedImages[0]->store('products', 'public');
+        } elseif (!empty($existingImages)) {
+            $data['main_image'] = $existingImages[0];
         }
 
         $data['slug'] = !empty($data['slug']) ? $data['slug'] : Str::slug($data['product_name']);
@@ -46,7 +52,7 @@ class ProductController extends Controller
 
         $product = Product::create($data);
 
-        $this->saveProductImages($product, $uploadedImages, $data['main_image'] ?? null);
+        $this->saveProductImages($product, $uploadedImages, $data['main_image'] ?? null, $existingImages);
 
         // Handle variations
         $this->saveVariations($product, $request);
@@ -65,15 +71,21 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $data = $request->validated();
-        unset($data['image'], $data['images'], $data['color_variations'], $data['size_variations'], $data['variations_enabled']);
+        unset($data['image'], $data['images'], $data['existing_images'], $data['color_variations'], $data['size_variations'], $data['variations_enabled']);
 
         $uploadedImages = $request->file('images', []);
         if ($request->hasFile('image') && empty($uploadedImages)) {
             $uploadedImages = [$request->file('image')];
         }
+        $existingImages = collect($request->input('existing_images', []))
+            ->filter()
+            ->values()
+            ->all();
 
         if (!empty($uploadedImages)) {
             $data['main_image'] = $uploadedImages[0]->store('products', 'public');
+        } elseif (!empty($existingImages)) {
+            $data['main_image'] = $existingImages[0];
         }
 
         if (!empty($data['product_name']) && empty($data['slug'])) {
@@ -87,9 +99,9 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        if (!empty($uploadedImages)) {
+        if (!empty($uploadedImages) || !empty($existingImages)) {
             $product->images()->delete();
-            $this->saveProductImages($product, $uploadedImages, $data['main_image'] ?? null);
+            $this->saveProductImages($product, $uploadedImages, $data['main_image'] ?? null, $existingImages);
         }
 
         if ($request->has('color_variations') || $request->has('variations_enabled')) {
@@ -168,8 +180,16 @@ class ProductController extends Controller
         }
     }
 
-    private function saveProductImages(Product $product, array $uploadedImages, ?string $mainImage): void
+    private function saveProductImages(Product $product, array $uploadedImages, ?string $mainImage, array $existingImages = []): void
     {
+        if (!empty($existingImages) && empty($uploadedImages)) {
+            foreach (array_slice($existingImages, 0, 5) as $image) {
+                $product->images()->create(['image_url' => $image]);
+            }
+
+            return;
+        }
+
         if ($mainImage) {
             $product->images()->create(['image_url' => $mainImage]);
         }
@@ -198,6 +218,12 @@ class ProductController extends Controller
 
     private function prepareHeroFields(array &$data, ?Product $product = null): void
     {
+        if (($data['status'] ?? $product?->status) !== 'active') {
+            $data['show_on_hero'] = false;
+            $data['hero_position'] = null;
+            return;
+        }
+
         if (!array_key_exists('show_on_hero', $data)) {
             return;
         }
